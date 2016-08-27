@@ -171,6 +171,14 @@ void gp::triangleStrip::draw()
                 float z=(-projA*x-projB*yscan-projD)/projC;
 
                 sf::Vector3f pointIntensity=(maxX-x)/(maxX-minX)*leftIntensity+(x-minX)/(maxX-minX)*rightIntensity;
+
+                gp::matrix pt(x,yscan,z,1);
+                gp::matrix temp=window->invtransform*pt;
+
+                temp=temp/temp(3,0);
+
+                window->vertexTableArray.push(sf::Vector3f(temp(0,0),temp(1,0),temp(2,0)));//, sf::Vector3f(x,yscan,z));
+
                 window->plotPoint(sf::Vector3f(x,yscan,z),pointIntensity);
             }
         }

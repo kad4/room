@@ -1,4 +1,8 @@
+#pragma once
 #include "header.hpp"
+#ifndef GP_HPP
+#define  GP_HPP
+
 
 namespace gp
 {
@@ -17,6 +21,8 @@ public:
 
     sf::Vector2i getOrder(void);
     void showElements(void);
+
+    matrix inv();
 
     void operator=(matrix);
     matrix operator /(float);
@@ -52,6 +58,21 @@ public:
 
 class triangleStrip;
 class object3d;
+class vertextablearray
+{
+public:
+    vertextablearray(){}
+    vector<float> projX, projY, projZ;
+    vector <sf::Vector3f> origVertex;
+
+    void push(sf::Vector3f v);
+    void push(sf::Vector3f v1, sf::Vector3f v2);
+    void setProjection(sf::Vector3f v, unsigned i);
+    void setOriginal(sf::Vector3f v, unsigned i);
+    void clear();
+    int getIndex(float xP, float yP, float zP);
+    int getIndex(sf::Vector3f v);
+};
 
 class mainWindow:public sf::RenderWindow
 {
@@ -84,7 +105,7 @@ class mainWindow:public sf::RenderWindow
     sf::Sprite windowSprite;
 
     //Dynamic array for z-buffer
-    zbuffer * points;
+    zbuffer * points, * pshadow;
 
     //Ambient light intensity
     sf::Vector3f Ia;
@@ -94,6 +115,9 @@ class mainWindow:public sf::RenderWindow
 
     //World coordinate to projection coordinate transformation matrix
     matrix mtransform;
+    matrix invtransform;
+
+
 public:
     mainWindow(int,int);
 
@@ -109,8 +133,12 @@ public:
     void setAmbientLight(sf::Vector3f);
     void addLightSource(sf::Vector3f,sf::Vector3f);
 
+    void mapShadow();
+    void displayShadow();
     void plotPoint(sf::Vector3f,sf::Vector3f);
     sf::Vector3f transformPoint(sf::Vector3f);
+
+    vertextablearray vertexTableArray;
 
     void saveScreenshot(void);
 
@@ -154,6 +182,7 @@ public:
 
     void project();
     void draw();
+    void projectShadow();
 
     friend class Surface;
     friend class object3d;
@@ -168,6 +197,7 @@ public:
     sf::Vector3f Ka, Kd, Ks;
     float ns;
 };
+
 
 class object3d
 {
@@ -187,6 +217,7 @@ public:
     vector <sf::Vector3i> faceTable;
     vector <sf::Vector3i> textureMap;
     vector <triangleStrip> triangles;
+    //static vector <triangleStrip> allTriangleStrips;
 
     Material material;
     mainWindow *window;
@@ -220,6 +251,7 @@ public:
 
 
 vector<gp::object3d> parseObj(string objName);
-void write1ToFile(vector <object3d> obj);
-}
+void writeToFile(vector <object3d> obj);
 
+}
+#endif // GP_HPP

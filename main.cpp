@@ -1,7 +1,8 @@
 #include "graphics.hpp"
+
 int main()
 {
-    sf::Vector3f lightPoint(506,435,1440);
+    sf::Vector3f lightPoint(80,384,2000);
     sf::Vector3f lightColor(185,190,120);
 
     gp::mainWindow window(1024,768);
@@ -19,6 +20,9 @@ int main()
 
     window.setAmbientLight(sf::Vector3f(255,255,255));
     window.addLightSource(lightPoint,lightColor);
+
+    bool showShadow = false;
+    bool showOther = false;
 
     vector <gp::object3d> objects = gp::parseObj("Objects.obj");
 
@@ -65,6 +69,7 @@ int main()
     {
         objects[i].setWindow(&window);
 
+//        gp::object3d::allTriangleStrips.clear();
         objects[i].mapTriangleStrip();
         objects[i].calculateintensity();
     }
@@ -86,6 +91,10 @@ int main()
                     viewPortPoint.z-=0.10;
                 if(event.key.code == sf::Keyboard::Up)
                     viewPortPoint.y+=0.10;
+                if(event.key.code == sf::Keyboard::K)
+                    if (showShadow) showShadow = false; else showShadow = true;
+                if(event.key.code == sf::Keyboard::L)
+                    if (showShadow) showOther = false; else showOther = true;
                 if(event.key.code == sf::Keyboard::Down)
                     viewPortPoint.y-=0.10;
                 if(event.key.code == sf::Keyboard::Left)
@@ -107,9 +116,12 @@ int main()
 
         for (unsigned i=0; i<objects.size(); i++)
         {
-//            if (objects[i].name == "Room")
-            objects[i].draw();
+            if (objects[i].name == "Room")
+                objects[i].draw();
+            else if (showOther)
+                objects[i].draw();
         }
+        if (showShadow) window.displayShadow();
         window.updateWindow();
     }
     return 0;

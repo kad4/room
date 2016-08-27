@@ -1,4 +1,7 @@
 #include "graphics.hpp"
+
+//vector<gp::triangleStrip> gp::object3d::allTriangleStrips;
+
 gp::object3d::object3d()
 {
     NumVertices = 0;
@@ -52,7 +55,9 @@ void gp::object3d::addTexture(sf::Vector2f texture)
 void gp::object3d::addVertices(vector <sf::Vector3f> vertices)
 {
     for (unsigned int i=0; i< vertices.size(); i++)
+    {
         vertexTable.push_back(vertices[i]);
+    }
 
     NumVertices += vertices.size();
 }
@@ -136,6 +141,8 @@ void gp::object3d::mapTriangleStrip()
         triangles.push_back(gp::triangleStrip(gp::makeVector(temp1),gp::makeVector(temp2),gp::makeVector(temp3)));
         triangles[i].setWindow(window);
         triangles[i].calcParameter();
+
+        //allTriangleStrips.push_back(triangles[i]);
     }
 }
 
@@ -220,4 +227,57 @@ void gp::object3d::translate(float tx,float ty,float tz)
     }
 
     calculateintensity();
+}
+void gp::vertextablearray::push(sf::Vector3f v)
+{
+    origVertex.push_back(v);
+    projX.push_back(v.x);
+    projY.push_back(v.y);
+    projZ.push_back(v.z);
+}
+
+void gp::vertextablearray::push(sf::Vector3f v1, sf::Vector3f v2)
+{
+    origVertex.push_back(v1);
+    projX.push_back(v2.x);
+    projY.push_back(v2.y);
+    projZ.push_back(v2.z);
+}
+
+void gp::vertextablearray::setProjection(sf::Vector3f v, unsigned i)
+{
+    projX[i] = (v.x);
+    projY[i] = (v.y);
+    projZ[i] = (v.z);
+}
+
+void gp::vertextablearray::setOriginal(sf::Vector3f v, unsigned i)
+{
+    origVertex[i].x = v.x;
+    origVertex[i].y = v.y;
+    origVertex[i].z = v.z;
+}
+
+void gp::vertextablearray::clear()
+{
+    origVertex.clear();
+    projX.clear();
+    projY.clear();
+    projZ.clear();
+}
+
+int gp::vertextablearray::getIndex(float xP, float yP, float zP)
+{
+    for (unsigned i = 0; i < origVertex.size(); i++)
+        if (xP == projX[i] && yP == projY[i] && zP == projZ[i]) return i;
+
+    return -1;
+}
+
+int gp::vertextablearray::getIndex(sf::Vector3f v)
+{
+    for (unsigned i = 0; i < origVertex.size(); i++)
+        if (v.x == origVertex[i].x && v.y == origVertex[i].y && v.z == origVertex[i].z) return i;
+
+    return -1;
 }

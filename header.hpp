@@ -1,3 +1,4 @@
+#pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <deque>
@@ -9,3 +10,4 @@
 #include <string>
 #include <ctime>
 using namespace std;
+

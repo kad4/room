@@ -16,6 +16,8 @@ gp::mainWindow::mainWindow(int wd,int ht): sf::RenderWindow(sf::VideoMode(wd,ht)
 
     //Z buffer
     points=new zbuffer [width*height];
+    pshadow=new zbuffer [width*height];
+
 }
 
 void gp::mainWindow::clearWindow()
@@ -26,11 +28,79 @@ void gp::mainWindow::clearWindow()
         for(int j=0; j<height; j++)
         {
             points[i+width*j]=zbuffer(-2000);
+            pshadow[i+width*j]=zbuffer(-2000);
         }
     }
 
     //Clears the intensity buffer
     windowImage.create(width,height);
+
+}
+
+void gp::mainWindow::mapShadow()
+{
+    float viewPlane=zviewPlane;
+    sf::Vector3f referencePoint=projectionPoint;
+    sf::Vector3f viewingOrigin=viewPoint;
+    sf::Vector3f lookat=lookAtPoint;
+
+    setViewPoint(light.Position+sf::Vector3f(0,0,10));
+    setLookAtPoint(light.Position+sf::Vector3f(0,0,0));
+    setProjection(light.Position+sf::Vector3f(512,384,2000),light.Position.z+500);
+    setViewVolume(sf::Vector3f(0,0,400),sf::Vector3f(1024,768,-400));
+
+    calcTransformation();
+
+    sf::Vector3f tempProjVector;
+
+    for (int i=0; i<vertexTableArray.origVertex.size(); i++)
+    {
+        tempProjVector = transformPoint(vertexTableArray.origVertex[i]);
+        //cerr << vertexTableArray.origVertex.size();
+        vertexTableArray.setProjection(tempProjVector, i);
+//        vertexTableArray.setOriginal(origVertex[i], i);
+    }
+
+    sf::Vector3f viewPortPoint(0,0,10);
+
+    setViewPoint(viewPortPoint);
+    setLookAtPoint(sf::Vector3f(0,0,0));
+
+    setProjection(sf::Vector3f(512,384,2000),500);
+    setViewVolume(sf::Vector3f(0,0,400),sf::Vector3f(1024,768,-400));
+    calcTransformation();
+
+}
+
+
+void gp::mainWindow::displayShadow()
+{
+    mapShadow();
+
+    vector <sf::Vector3f> shadowPoints;
+
+    for (unsigned i=0;i<vertexTableArray.origVertex.size();i++)
+    {
+        sf::Vector3f pos = sf::Vector3f(vertexTableArray.projX[i],vertexTableArray.projY[i],vertexTableArray.projZ[i]);
+
+        int x=static_cast<int>(pos.x+0.5);
+        int y=static_cast<int>(pos.y+0.5);
+        float z=pos.z;
+
+        if(pshadow[x+width*y].z<=z)
+        {
+            shadowPoints.push_back(sf::Vector3f(x,y,pshadow[x+width*y].z));
+            plotPoint(sf::Vector3f(x,y,pshadow[x+width*y].z),sf::Vector3f(20,20,20));
+            pshadow[x+width*y].z=z;
+        }
+        else
+        {
+            shadowPoints.push_back(vertexTableArray.origVertex[i]);
+            plotPoint(transformPoint(vertexTableArray.origVertex[i]),sf::Vector3f(20,20,20));
+        }
+
+    }
+    vertexTableArray.clear();
 }
 
 void gp::mainWindow::updateWindow()
@@ -163,6 +233,7 @@ void gp::mainWindow::calcTransformation()
 
     //Transformation matrix
     mtransform=mperspective*rt;
+    invtransform=mtransform.inv();
 }
 
 sf::Vector3f gp::mainWindow::transformPoint(sf::Vector3f pt)
@@ -216,6 +287,9 @@ void gp::mainWindow::plotPoint(sf::Vector3f pt, sf::Vector3f Intensity)
 //    pos.y=height*(1-npcoordinate(1,0));
 //    pos.z=npcoordinate(2,0);
 
+    if(pt.z>zviewPlane)
+        ;//return;
+
     sf::Vector3f pos;
     pos.x=pt.x;
     pos.y=height-pt.y;
@@ -243,7 +317,7 @@ void gp::mainWindow::plotPoint(sf::Vector3f pt, sf::Vector3f Intensity)
     if(x<0 || x>=width || y<0 || y>=height)
         return;
 
-    if(points[x+width*y].z<z)
+    if(points[x+width*y].z<=z)
     {
         points[x+width*y].z=z;
         windowImage.setPixel(x,y,color);

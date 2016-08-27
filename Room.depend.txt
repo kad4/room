@@ -566,3 +566,37 @@
 1395754945 source:g:\dropbox\memokad\graphics\room\window.cpp
 	"graphics.hpp"
 
+1399232597 source:d:\dropbox\project\graphics\room\graphics.cpp
+	"graphics.hpp"
+
+1399233734 d:\dropbox\project\graphics\room\graphics.hpp
+	"header.hpp"
+
+1399099738 d:\dropbox\project\graphics\room\header.hpp
+	<SFML/Graphics.hpp>
+	<vector>
+	<deque>
+	<iostream>
+	<cmath>
+	<algorithm>
+	<fstream>
+	<sstream>
+	<string>
+	<ctime>
+
+1399243458 source:d:\dropbox\project\graphics\room\main.cpp
+	"graphics.hpp"
+
+1399235743 source:d:\dropbox\project\graphics\room\matrix.cpp
+	"graphics.hpp"
+
+1399228267 source:d:\dropbox\project\graphics\room\obj.cpp
+	"header.hpp"
+	"graphics.hpp"
+
+1399239277 source:d:\dropbox\project\graphics\room\triangles.cpp
+	"graphics.hpp"
+
+1399239967 source:d:\dropbox\project\graphics\room\window.cpp
+	"graphics.hpp"
+

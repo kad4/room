@@ -1,7 +1,7 @@
 #include "header.hpp"
 #include "graphics.hpp"
 
-void writeToFile(vector <gp::object3d> objects)
+void gp::writeToFile(vector <gp::object3d> objects)
 {
     ofstream objFile("room.dat");
 
@@ -16,8 +16,6 @@ void writeToFile(vector <gp::object3d> objects)
     string TName;
 
     unsigned int NumVertices, NumFaces;
-
-    int size = objects.size();
 
     for (unsigned int i=0; i<objects.size(); i++)
     {
@@ -306,11 +304,9 @@ vector<gp::object3d> gp::parseObj (string objName)
     objects.push_back(*tempObj);
     objectCount++;
 
-
     gp::object3d newObj = *tempObj;
     delete tempObj;
     objFile.close();
-
 
     ofstream counter("count.dat");
     counter << objectCount << ' ' << verticesCount << ' ' << facesCount;
